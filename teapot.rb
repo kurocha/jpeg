@@ -3,22 +3,28 @@
 #  This file is part of the "Teapot" project, and is released under the MIT license.
 #
 
-required_version "0.1"
+required_version "0.5"
 
-define_package "jpeg-8d" do |package|
-	package.build(:all) do |platform, environment|
-		environment.use in: package.source_path do |config|
+define_target "jpeg" do |target|
+	target.install do |environment|
+		environment.use in:(package.path + "jpeg-8d") do |config|
 			Commands.run("make", "clean") if File.exist? "Makefile"
 				
 			Commands.run("./configure",
-				"--prefix=#{platform.prefix}",
+				"--prefix=#{config.install_prefix}",
 				"--disable-dependency-tracking",
 				"--enable-shared=no",
 				"--enable-static=yes",
 				*config.configure
 			)
 				
-			Commands.run("make install")
+			Commands.run("make", "install")
 		end
+	end
+	
+	target.depends :platform
+	
+	target.provides "Library/jpeg" do
+		append linkflags "-ljpeg"
 	end
 end
