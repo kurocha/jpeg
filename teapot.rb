@@ -6,8 +6,8 @@
 required_version "0.6"
 
 define_target "jpeg" do |target|
-	target.install do |environment|
-		install_external(package.path, "jpeg-8d", environment) do |config, fresh|
+	target.build do |environment|
+		build_external(package.path, "jpeg-8d", environment) do |config, fresh|
 			if fresh
 				Commands.run!("./configure",
 					"--prefix=#{config.install_prefix}",
