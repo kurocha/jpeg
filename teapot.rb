@@ -11,12 +11,14 @@ define_target "jpeg" do |target|
 		cache_prefix = Files::Directory.join(environment[:build_prefix], "libjpeg-turbo-1.3.90-#{environment.checksum}")
 		package_files = Path.join(environment[:install_prefix], "lib/pkgconfig/libjpeg-turbo13.pc")
 
-		cmake source: source_files, build_prefix: cache_prefix
-
+		cmake source: source_files, build_prefix: cache_prefix, arguments: [
+			"-DBUILD_SHARED_LIBS=OFF",
+		]
+		
 		make prefix: cache_prefix, package_files: package_files
 	end
 	
-	target.depends "Build/Files"
+	target.depends "Build/Make"
 	target.depends "Build/CMake"
 	
 	target.depends :platform
