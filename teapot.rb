@@ -9,7 +9,7 @@ define_target "jpeg" do |target|
 	target.build do
 		source_files = Files::Directory.join(target.package.path, "jpeg-9a")
 		cache_prefix = Path.join(environment[:build_prefix], "jpeg-9a-#{environment.checksum}")
-		package_file = Path.join(environment[:install_prefix], "lib/libjpeg.a")
+		package_files = Path.join(environment[:install_prefix], "lib/libjpeg.a")
 		
 		copy source: source_files, prefix: cache_prefix
 		
@@ -23,7 +23,7 @@ define_target "jpeg" do |target|
 				chdir: cache_prefix
 		end
 		
-		make prefix: cache_prefix, package_files: [package_file]
+		make prefix: cache_prefix, package_files: package_files
 	end
 	
 	target.depends "Build/Files"
@@ -32,6 +32,6 @@ define_target "jpeg" do |target|
 	target.depends :platform
 	
 	target.provides "Library/jpeg" do
-		append linkflags "-ljpeg"
+		append linkflags {install_prefix + "lib/libjpeg.a"}
 	end
 end
