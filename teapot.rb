@@ -13,9 +13,9 @@ define_target "jpeg" do |target|
 		
 		copy source: source_files, prefix: cache_prefix
 		
-		run! "autoreconf", "-fiv", chdir: cache_prefix
-		
 		configure prefix: cache_prefix do
+			run! "autoreconf", "-fiv", chdir: cache_prefix
+			
 			run! "./configure",
 				"--prefix=#{environment[:install_prefix]}",
 				"--disable-dependency-tracking",
