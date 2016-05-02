@@ -7,8 +7,8 @@ teapot_version "1.0"
 
 define_target "jpeg" do |target|
 	target.build do
-		source_files = Files::Directory.join(target.package.path, "jpeg-9a")
-		cache_prefix = Path.join(environment[:build_prefix], "jpeg-9a-#{environment.checksum}")
+		source_files = Files::Directory.join(target.package.path, "libjpeg-turbo")
+		cache_prefix = Path.join(environment[:build_prefix], "libjpeg-turbo-#{environment.checksum}")
 		package_files = Path.join(environment[:install_prefix], "lib/libjpeg.a")
 		
 		copy source: source_files, prefix: cache_prefix
@@ -32,6 +32,16 @@ define_target "jpeg" do |target|
 	target.depends :platform
 	
 	target.provides "Library/jpeg" do
-		append linkflags {install_prefix + "lib/libjpeg.a"}
+		append linkflags [
+			->{install_prefix + "lib/libjpeg.a"},
+			->{install_prefix + "lib/libturbojpeg.a"}
+		]
 	end
+end
+
+define_configuration 'test' do |configuration|
+	configuration[:source] = "https://github.com/kurocha"
+	
+	configuration.require 'platforms'
+	configuration.require 'build-make'
 end
