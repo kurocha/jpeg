@@ -8,8 +8,8 @@ teapot_version "1.0"
 define_target "jpeg" do |target|
 	target.build do
 		source_files = Files::Directory.join(target.package.path, "libjpeg-turbo")
-		cache_prefix = Path.join(environment[:build_prefix], "libjpeg-turbo-#{environment.checksum}")
-		package_files = Path.join(environment[:install_prefix], "lib/libjpeg.a")
+		cache_prefix = environment[:build_prefix] / environment.checksum + "libjpeg-turbo"
+		package_files = environment[:install_prefix] / "lib/libjpeg.a"
 		
 		copy source: source_files, prefix: cache_prefix
 		
