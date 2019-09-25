@@ -15,7 +15,7 @@ define_target "jpeg" do |target|
 	target.provides "Library/jpeg" do
 		source_files = target.package.path + "libjpeg-turbo"
 		cache_prefix = environment[:build_prefix] / environment.checksum + "libjpeg"
-		package_files = cache_prefix / "lib/libjpeg.a"
+		package_files = cache_prefix.list("lib/libjpeg.a", "lib/libturbojpeg.a")
 		
 		cmake source: source_files, build_prefix: cache_prefix, arguments: [
 			"-DBUILD_SHARED_LIBS=OFF",
@@ -23,11 +23,7 @@ define_target "jpeg" do |target|
 		
 		make prefix: cache_prefix, package_files: package_files
 		
-		append linkflags [
-			cache_prefix + "lib/libjpeg.a",
-			cache_prefix + "lib/libjpegturbo.a"
-		]
-		
+		append linkflags package_files
 		append header_search_paths cache_prefix + "include"
 	end
 end
