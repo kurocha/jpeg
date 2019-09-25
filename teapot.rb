@@ -6,44 +6,37 @@
 teapot_version "1.0"
 
 define_target "jpeg" do |target|
-	target.build do
-		source_files = Files::Directory.join(target.package.path, "libjpeg-turbo")
-		cache_prefix = environment[:build_prefix] / environment.checksum + "libjpeg-turbo"
-		package_files = environment[:install_prefix] / "lib/libjpeg.a"
-		
-		copy source: source_files, prefix: cache_prefix
-		
-		configure prefix: cache_prefix do
-			run! "autoreconf", "-fiv", chdir: cache_prefix
-			
-			run! "./configure",
-				"--prefix=#{environment[:install_prefix]}",
-				"--disable-dependency-tracking",
-				"--enable-shared=no",
-				"--enable-static=yes",
-				*environment[:configure],
-				chdir: cache_prefix
-		end
-		
-		make prefix: cache_prefix, package_files: package_files
-	end
-	
-	target.depends "Build/Files"
-	target.depends "Build/Make"
-	
 	target.depends :platform
+	target.depends "Library/z"
+	
+	target.depends "Build/Make"
+	target.depends "Build/CMake"
 	
 	target.provides "Library/jpeg" do
-		append linkflags [
-			->{install_prefix + "lib/libjpeg.a"},
-			->{install_prefix + "lib/libturbojpeg.a"}
+		source_files = target.package.path + "libjpeg-turbo"
+		cache_prefix = environment[:build_prefix] / environment.checksum + "libjpeg"
+		package_files = cache_prefix / "lib/libjpeg.a"
+		
+		cmake source: source_files, build_prefix: cache_prefix, arguments: [
+			"-DBUILD_SHARED_LIBS=OFF",
 		]
+		
+		make prefix: cache_prefix, package_files: package_files
+		
+		append linkflags [
+			cache_prefix + "lib/libjpeg.a",
+			cache_prefix + "lib/libjpegturbo.a"
+		]
+		
+		append header_search_paths cache_prefix + "include"
 	end
 end
 
 define_configuration 'test' do |configuration|
-	configuration[:source] = "https://github.com/kurocha"
+	configuration[:source] = "https://github.com/kurocha/"
 	
-	configuration.require 'platforms'
-	configuration.require 'build-make'
+	configuration.require "platforms"
+	
+	configuration.require "build-make"
+	configuration.require "build-cmake"
 end
