@@ -3,7 +3,7 @@
 #  This file is part of the "Teapot" project, and is released under the MIT license.
 #
 
-teapot_version "1.0"
+teapot_version "3.0"
 
 define_target "jpeg" do |target|
 	target.depends :platform
@@ -15,13 +15,11 @@ define_target "jpeg" do |target|
 	target.provides "Library/jpeg" do
 		source_files = target.package.path + "libjpeg-turbo"
 		cache_prefix = environment[:build_prefix] / environment.checksum + "libjpeg"
-		package_files = cache_prefix.list("lib/libjpeg.a", "lib/libturbojpeg.a")
+		package_files = cache_prefix.list("build/libjpeg.a", "build/libturbojpeg.a")
 		
-		cmake source: source_files, build_prefix: cache_prefix, arguments: [
+		cmake source: source_files, install_prefix: cache_prefix, arguments: [
 			"-DBUILD_SHARED_LIBS=OFF",
-		]
-		
-		make prefix: cache_prefix, package_files: package_files
+		], package_files: package_files
 		
 		append linkflags package_files
 		append header_search_paths cache_prefix + "include"
